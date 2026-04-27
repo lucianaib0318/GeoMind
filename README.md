@@ -1,5 +1,11 @@
 # GeoMind
 
+基于飞书 CLI + 腾讯位置服务的科研与产业地理情报可视化 Skill。
+
+GeoMind 可以读取飞书文档中的非结构化产业信息，自动抽取科研机构、企业、工厂、实验室、园区、供应链节点和合作关系，调用腾讯位置服务完成地理编码，并生成可演示的腾讯地图 JSAPI GL 前端、结构化 JSON、白板 DSL，以及可写回飞书文档的 GIF/HTML 展示结果。
+
+当前 Demo：**中国新能源与智能制造产业分布网络**
+
 ## 开发背景
 
 对于腾讯位置服务的开发，很多项目停留在地图可视化本身：把点、线、面展示在地图上，或者做一些常见的旅游攻略、POI 推荐、轨迹展示。但真正把地图能力和 AI Agent 的信息抽取、结构化推理、自动化发布结合起来的作品并不多。
@@ -10,21 +16,72 @@
 
 GeoMind 给出的答案是：把飞书文档中的科研机构、企业、工厂、实验室、园区、供应链和合作关系，自动抽取成结构化地理情报，再通过腾讯地图生成可视化的产业关系网络。这就是本项目带来的参赛作品：**科研与产业地理情报可视化 Skill**。
 
-GeoMind 是一个基于 TypeScript + Node.js 的地理情报可视化 Skill。它通过飞书 CLI 读取飞书文档，抽取科研机构、企业、工厂、实验室、园区和供应链关系，调用腾讯位置服务完成地理编码，并生成可演示的腾讯地图 JSAPI GL 前端、结构化 JSON 和白板 DSL。
+## 项目定位
 
-当前 Demo 标题：**中国新能源与智能制造产业分布网络**。
+GeoMind 不是一个普通地图 Demo，也不是单纯的飞书文档自动化脚本。
+
+它关注的是一个更具体的场景：研究人员、产业分析师、投资人、招商团队或企业战略团队经常会把大量信息沉淀在飞书文档里，这些信息包括企业、园区、实验室、产线、供应链和合作关系。文本本身很难直接呈现空间格局，也很难解释跨区域协同关系。GeoMind 将这些内容转化为可验证、可复用、可展示的地理情报图谱。
 
 ## 核心能力
 
-- 读取飞书文档 URL、wiki token、doc/docx token，或本地 Markdown 示例
-- 清洗文档文本并抽取实体、地点、技术领域和关系证据
-- 使用腾讯位置服务地理编码，并带缓存和失败兜底
-- 输出经过 JSON Schema 校验的结构化结果
-- 生成腾讯地图 JSAPI GL 前端：卫星底图、节点、蓝色荧光弧线、流动数据点、右侧滚动面板
-- 生成飞书白板可转换的中间 DSL
-- 通过飞书 CLI 把运行结果发布回飞书文档：说明区、地图截图、HTML 交互附件
+- 文档读取：通过飞书 CLI 读取飞书 wiki/doc/docx，或读取本地 Markdown 示例
+- 文本清洗：保留段落结构，清理低价值格式噪声
+- 实体抽取：抽取机构、企业、工厂、实验室、园区、供应链节点和地点
+- 关系建模：抽取协作、供应、客户、联合实验室、技术转移等关系
+- 地理编码：调用腾讯位置服务 geocoder，并提供缓存和兜底坐标
+- 结构校验：使用 JSON Schema 校验最终输出，避免只有自然语言结果
+- 地图前端：生成腾讯地图 JSAPI GL 页面，展示真实地图、节点、弧形荧光关系线和数据流动动画
+- 飞书发布：通过飞书 CLI 将 GIF 预览和 HTML 交互附件写回飞书文档
+- 白板适配：生成白板 DSL 中间结构，便于后续接入飞书白板
 
-## 目录结构
+## 运行效果
+
+Demo 会生成一个全国新能源与智能制造产业协同网络：
+
+- 32 个产业节点
+- 35 条关系链路
+- 32 个节点完成地理定位
+- 覆盖华北、东北、华东、华中、华南、西南、西北和海南
+- 使用腾讯卫星地图作为底图
+- 使用蓝色荧光弧线展示跨区域关系
+- 使用流动点展示数据、技术或供应链能力传递
+
+生成结果包括：
+
+- `examples/sample-output.json`：完整结构化输出
+- `output/geomind.html`：可交互腾讯地图前端
+- `output/geomind.svg`：SVG 兜底预览
+- `output/geomind-feishu-preview.gif`：可插入飞书文档的动态预览
+
+这些输出文件默认不会进入 Git 仓库。
+
+## 工作流
+
+```mermaid
+flowchart LR
+  A["Feishu document / Markdown"] --> B["Feishu CLI reader"]
+  B --> C["Text cleaner"]
+  C --> D["Entity and relation extractor"]
+  D --> E["Tencent geocoder"]
+  E --> F["Schema-validated JSON"]
+  F --> G["Tencent Map HTML"]
+  F --> H["Whiteboard DSL"]
+  G --> I["PNG / GIF preview"]
+  I --> J["Feishu document publishing"]
+  G --> J
+```
+
+## 技术栈
+
+- TypeScript
+- Node.js 20+
+- Feishu CLI / Lark CLI
+- Tencent Location Service WebService API
+- Tencent Map JavaScript API GL
+- AJV JSON Schema validation
+- Vitest
+
+## 项目结构
 
 ```text
 src
@@ -45,65 +102,55 @@ src
 ## 快速开始
 
 ```bash
+git clone git@github.com:lucianaib0318/GeoMind.git
+cd GeoMind
 npm install
 npm run demo
 ```
 
-Demo 会读取 `examples/sample-input.md`，并生成：
+运行后会生成：
 
-- `examples/sample-output.json`
-- `output/geomind.html`
-- `output/geomind.svg`
+```text
+examples/sample-output.json
+output/geomind.html
+output/geomind.svg
+```
+
+直接用浏览器打开 `output/geomind.html` 即可查看地图前端。如果需要本地静态服务，可以使用任意静态服务器指向 `output/` 目录。
 
 ## 环境变量
 
-复制 `.env.example` 为 `.env`，然后配置腾讯位置服务 key：
+复制 `.env.example` 为 `.env`：
+
+```bash
+cp .env.example .env
+```
+
+Windows PowerShell：
+
+```powershell
+Copy-Item .env.example .env
+```
+
+配置腾讯位置服务 key：
 
 ```bash
 TENCENT_MAP_KEY=your-tencent-map-key
 ```
 
-如果要读取飞书文档，配置飞书 CLI 的读取命令模板：
+配置飞书 CLI 文档读取模板：
 
 ```bash
 FEISHU_CLI_COMMAND_TEMPLATE="lark-cli docs +fetch --doc {url} --api-version v2 --format json"
 ```
 
-## 常用命令
+支持的占位符：
 
-本地 Demo：
+- `{url}`：原始飞书文档 URL
+- `{token}`：解析后的 wiki/doc/docx token
+- `{kind}`：`doc`、`docx`、`wiki` 或 `unknown`
 
-```bash
-npm run demo
-```
-
-读取飞书文档并生成前端：
-
-```bash
-npm run dev -- --url "https://your.feishu.cn/wiki/xxx" --out output/geomind.json --whiteboard-out output/whiteboard.json --html-out output/geomind.html --svg-out output/geomind.svg
-```
-
-把可视化结果发布回飞书文档：
-
-```bash
-npm run publish:feishu -- --doc "https://your.feishu.cn/wiki/xxx"
-```
-
-使用 GIF 动态预览：
-
-```bash
-npm run publish:feishu -- --doc "https://your.feishu.cn/wiki/xxx" --gif
-```
-
-`publish:feishu` 会自动截取 `output/geomind.html` 的腾讯地图前端，并通过飞书 CLI 向文档追加：
-
-- 运行摘要和产品说明
-- 腾讯地图前端截图，或使用 `--gif` 生成动态预览
-- `geomind.html` 交互页面附件
-
-说明：飞书文档正文通常不会直接执行第三方 HTML/JS，所以文档内展示采用截图预览；真正可拖拽、缩放、点击节点的腾讯地图保留在 HTML 附件中。
-
-## 飞书 CLI
+## 飞书 CLI 设置
 
 安装并认证：
 
@@ -123,6 +170,125 @@ $env:Path = "$npmBin;$env:Path"
 [Environment]::SetEnvironmentVariable("Path", "$npmBin;$([Environment]::GetEnvironmentVariable('Path', 'User'))", "User")
 ```
 
+如果 `npx skills add larksuite/cli -y -g` 报 `spawn git ENOENT`，需要先安装 Git for Windows。
+
+## 常用命令
+
+本地 Demo：
+
+```bash
+npm run demo
+```
+
+读取飞书文档并生成 JSON、白板 DSL、HTML 和 SVG：
+
+```bash
+npm run dev -- --url "https://your.feishu.cn/wiki/xxx" --out output/geomind.json --whiteboard-out output/whiteboard.json --html-out output/geomind.html --svg-out output/geomind.svg
+```
+
+只输出完整 JSON 到终端：
+
+```bash
+npm run dev -- --input-file examples/sample-input.md --print-json
+```
+
+跳过腾讯地理编码：
+
+```bash
+npm run dev -- --input-file examples/sample-input.md --skip-geocode
+```
+
+发布可视化结果回飞书文档：
+
+```bash
+npm run publish:feishu -- --doc "https://your.feishu.cn/wiki/xxx"
+```
+
+使用 GIF 动态预览：
+
+```bash
+npm run publish:feishu -- --doc "https://your.feishu.cn/wiki/xxx" --gif
+```
+
+`publish:feishu` 会自动截取 `output/geomind.html` 的腾讯地图前端，并通过飞书 CLI 向文档写入：
+
+- 运行摘要
+- PNG 截图或 GIF 动态预览
+- `geomind.html` 交互页面附件
+
+说明：飞书文档正文通常不会直接执行第三方 HTML/JS，所以文档内展示采用图片或 GIF；真正可拖拽、缩放、点击节点的腾讯地图保留在 HTML 附件中。
+
+## 示例输入格式
+
+推荐在飞书文档中使用显式结构，便于 MVP 规则抽取器稳定工作：
+
+```text
+实体: 北京智能制造协调中心 | 类型: government_agency | 地点: 北京海淀 | 技术: 智能制造、大模型、工业互联网 | 证据: 负责全国智能制造示范工厂的数据协同与标准评估。
+关系: 北京智能制造协调中心 -> 深圳南山AI计算中心 | 类型: collaboration | 证据: 双方共建全国工厂数据治理平台。
+```
+
+支持的实体类型：
+
+- `research_institute`
+- `university`
+- `company`
+- `factory`
+- `lab`
+- `industrial_park`
+- `government_agency`
+- `supply_chain_node`
+- `location`
+- `other`
+
+支持的关系类型：
+
+- `collaboration`
+- `investment`
+- `supply`
+- `customer`
+- `joint_lab`
+- `located_in`
+- `subsidiary`
+- `technology_transfer`
+- `competition`
+- `other`
+
+## 输出结构
+
+最终 JSON 包含：
+
+- `entities`：实体名称、类型、地点文本、技术领域、证据、地理编码结果
+- `relations`：source、target、relationType、evidence、confidence
+- `whiteboard`：节点、连线、图例、画布和说明
+- `summary`：实体数、关系数、地理编码数量和重点技术领域
+- `warnings`：非致命问题，例如地理编码失败
+
+## Skill 接入说明
+
+仓库根目录的 `SKILL.md` 是 GeoMind 的 Skill 初稿，描述了：
+
+- 适用场景
+- 输入约定
+- 环境变量
+- CLI 命令
+- 输出契约
+- 飞书发布边界
+
+后续可以将其接入飞书 CLI Skill 或 Agent 工具体系，让 Agent 根据用户输入的飞书文档链接自动运行完整流程。
+
+## 安全说明
+
+不要提交以下内容：
+
+- `.env`
+- 腾讯位置服务真实 key
+- 飞书私有文档链接或内部 token
+- `output/` 中生成的 HTML、GIF、截图和 JSON
+- `cache/` 中的地理编码缓存
+- SSH key、证书或本机浏览器 profile
+
+当前 `.gitignore` 已默认排除这些文件。更多说明见 [docs/security.md](docs/security.md)。
+
 ## 验证
 
 ```bash
@@ -131,19 +297,22 @@ npm run build
 npm test
 ```
 
-## 输出结构
+## 当前边界
 
-最终 JSON 包含：
+- 实体和关系抽取当前是规则 MVP，适合结构化或半结构化输入
+- 腾讯地图交互前端生成在 HTML 中，飞书正文内以图片/GIF 方式展示
+- 白板 DSL 已生成中间结构，后续还需要进一步适配飞书白板真实节点 API
+- GIF 预览通过本地浏览器截图合成，依赖本机安装 Chrome 或 Edge
 
-- `entities`：实体名称、类型、地点文本、技术领域、证据、地理编码结果
-- `relations`：source、target、relation_type、evidence、confidence
-- `whiteboard`：节点、连线、图例、画布和说明
-- `summary`：实体数、关系数、地理编码数量和重点技术领域
-- `warnings`：非致命问题，例如地理编码失败
+## 路线图
 
-## 下一步
-
+- 接入 LLM 结构化抽取，提升自由文本解析能力
 - 将白板 DSL 直接写入飞书白板块
-- 接入 LLM 结构化抽取，替换当前规则抽取 MVP
-- 增加热力图、POI 分布、轨迹和区域潜力分析
+- 增加热力图、POI 分布、区域潜力分析和轨迹图层
 - 将交互地图发布到 HTTPS 地址，用于飞书链接卡片和团队共享
+- 增加批量文档分析和多项目对比
+- 增加 MCP/Agent 工具接口
+
+## License
+
+MIT
