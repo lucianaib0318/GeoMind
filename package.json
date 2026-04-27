@@ -1,0 +1,51 @@
+{
+  "name": "geomind",
+  "version": "0.1.0",
+  "description": "GeoMind: Feishu CLI + Tencent Location based geo-intelligence visualization skill.",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/lucianaib0318/GeoMind.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lucianaib0318/GeoMind/issues"
+  },
+  "homepage": "https://github.com/lucianaib0318/GeoMind#readme",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "bin": {
+    "geomind": "./dist/index.js"
+  },
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "demo": "tsx src/index.ts --input-file examples/sample-input.md --out examples/sample-output.json --html-out output/geomind.html --svg-out output/geomind.svg",
+    "publish:feishu": "tsx src/feishu/publishToFeishu.ts",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "keywords": [
+    "feishu",
+    "lark",
+    "tencent-map",
+    "geocoding",
+    "whiteboard",
+    "skill",
+    "geo-intelligence"
+  ],
+  "dependencies": {
+    "ajv": "^8.17.1",
+    "commander": "^12.1.0",
+    "dotenv": "^16.4.7",
+    "gif-encoder-2": "^1.0.5",
+    "pngjs": "^7.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^3.2.4"
+  }
+}

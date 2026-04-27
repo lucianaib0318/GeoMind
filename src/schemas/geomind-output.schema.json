@@ -1,0 +1,573 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://geomind.dev/schemas/geomind-output.schema.json",
+  "title": "GeoMindOutput",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "generatedAt",
+    "input",
+    "document",
+    "extraction",
+    "entities",
+    "relations",
+    "whiteboard",
+    "summary",
+    "warnings"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "0.1.0"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "input": {
+      "$ref": "#/$defs/documentInput"
+    },
+    "document": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stats"],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "stats": {
+          "$ref": "#/$defs/documentStats"
+        }
+      }
+    },
+    "extraction": {
+      "$ref": "#/$defs/extractionResult"
+    },
+    "entities": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/enrichedEntity"
+      }
+    },
+    "relations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/relation"
+      }
+    },
+    "whiteboard": {
+      "$ref": "#/$defs/whiteboardDsl"
+    },
+    "summary": {
+      "$ref": "#/$defs/summary"
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "$defs": {
+    "documentInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source"],
+      "properties": {
+        "source": {
+          "const": "feishu"
+        },
+        "url": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": ["doc", "docx", "wiki", "unknown"]
+        }
+      },
+      "anyOf": [
+        {
+          "required": ["url"]
+        },
+        {
+          "required": ["token"]
+        }
+      ]
+    },
+    "documentStats": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["originalChars", "cleanedChars", "sectionCount"],
+      "properties": {
+        "originalChars": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "cleanedChars": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sectionCount": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "entity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "type", "techFields"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "$ref": "#/$defs/entityType"
+        },
+        "locationText": {
+          "type": "string"
+        },
+        "techFields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "enrichedEntity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "type", "techFields"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "$ref": "#/$defs/entityType"
+        },
+        "locationText": {
+          "type": "string"
+        },
+        "techFields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "geocode": {
+          "$ref": "#/$defs/geocodedLocation"
+        }
+      }
+    },
+    "relation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "source", "target", "relationType", "evidence"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1
+        },
+        "relationType": {
+          "$ref": "#/$defs/relationType"
+        },
+        "evidence": {
+          "type": "string"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "extractionResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entities", "relations", "warnings"],
+      "properties": {
+        "entities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/entity"
+          }
+        },
+        "relations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/relation"
+          }
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "geocodedLocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "query", "status"],
+      "properties": {
+        "provider": {
+          "const": "tencent"
+        },
+        "query": {
+          "type": "string"
+        },
+        "status": {
+          "enum": ["resolved", "cached", "fallback", "failed"]
+        },
+        "coordinates": {
+          "$ref": "#/$defs/coordinates"
+        },
+        "formattedAddress": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "province": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "district": {
+          "type": "string"
+        },
+        "cachedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "error": {
+          "type": "string"
+        },
+        "raw": true
+      }
+    },
+    "coordinates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lat", "lng"],
+      "properties": {
+        "lat": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        },
+        "lng": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180
+        }
+      }
+    },
+    "whiteboardDsl": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "title", "canvas", "nodes", "edges", "legend", "notes"],
+      "properties": {
+        "schemaVersion": {
+          "const": "0.1.0"
+        },
+        "title": {
+          "type": "string"
+        },
+        "canvas": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["width", "height", "projection"],
+          "properties": {
+            "width": {
+              "type": "number",
+              "minimum": 1
+            },
+            "height": {
+              "type": "number",
+              "minimum": 1
+            },
+            "projection": {
+              "const": "geo-grid-mvp"
+            }
+          }
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/whiteboardNode"
+          }
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/whiteboardEdge"
+          }
+        },
+        "legend": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/legendItem"
+          }
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "whiteboardNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "entityId", "label", "type", "position", "size", "style"],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "entityId": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/entityType"
+        },
+        "position": {
+          "$ref": "#/$defs/point"
+        },
+        "size": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["width", "height"],
+          "properties": {
+            "width": {
+              "type": "number"
+            },
+            "height": {
+              "type": "number"
+            }
+          }
+        },
+        "style": {
+          "$ref": "#/$defs/nodeStyle"
+        },
+        "metadata": {
+          "type": "object"
+        }
+      }
+    },
+    "whiteboardEdge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "relationId", "sourceNodeId", "targetNodeId", "label", "style"],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "relationId": {
+          "type": "string"
+        },
+        "sourceNodeId": {
+          "type": "string"
+        },
+        "targetNodeId": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "style": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["stroke", "lineStyle"],
+          "properties": {
+            "stroke": {
+              "type": "string"
+            },
+            "lineStyle": {
+              "enum": ["solid", "dashed"]
+            }
+          }
+        },
+        "metadata": {
+          "type": "object"
+        }
+      }
+    },
+    "legendItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "color"],
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "color": {
+          "type": "string"
+        },
+        "entityType": {
+          "$ref": "#/$defs/entityType"
+        },
+        "relationType": {
+          "$ref": "#/$defs/relationType"
+        }
+      }
+    },
+    "point": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y"],
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        }
+      }
+    },
+    "nodeStyle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fill", "stroke", "textColor"],
+      "properties": {
+        "fill": {
+          "type": "string"
+        },
+        "stroke": {
+          "type": "string"
+        },
+        "textColor": {
+          "type": "string"
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "text",
+        "entityCount",
+        "relationCount",
+        "geocodedCount",
+        "failedGeocodeCount",
+        "topTechFields"
+      ],
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "entityCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "relationCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "geocodedCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failedGeocodeCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "topTechFields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "entityType": {
+      "enum": [
+        "research_institute",
+        "university",
+        "company",
+        "factory",
+        "lab",
+        "industrial_park",
+        "government_agency",
+        "supply_chain_node",
+        "location",
+        "other"
+      ]
+    },
+    "relationType": {
+      "enum": [
+        "collaboration",
+        "investment",
+        "supply",
+        "customer",
+        "joint_lab",
+        "located_in",
+        "subsidiary",
+        "technology_transfer",
+        "competition",
+        "other"
+      ]
+    }
+  }
+}

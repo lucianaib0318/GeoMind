@@ -1,0 +1,16 @@
+node_modules/
+dist/
+coverage/
+output/
+.env
+.env.*
+!.env.example
+cache/
+examples/sample-output.json
+*.local
+*.secret.*
+*.key
+*.pem
+*.log
+.DS_Store
+Thumbs.db
