@@ -21,9 +21,11 @@
   "scripts": {
     "dev": "tsx src/index.ts",
     "demo": "tsx src/index.ts --input-file examples/sample-input.md --out examples/sample-output.json --html-out output/geomind.html --svg-out output/geomind.svg",
+    "demo:offline": "tsx src/index.ts --input-file examples/sample-input.md --skip-geocode --out examples/sample-output.json --html-out output/geomind.html --svg-out output/geomind.svg",
     "publish:feishu": "tsx src/feishu/publishToFeishu.ts",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit",
+    "check": "npm run typecheck && npm run build && npm test",
     "test": "vitest run"
   },
   "keywords": [

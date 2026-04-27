@@ -297,6 +297,18 @@ npm run build
 npm test
 ```
 
+也可以直接运行完整检查：
+
+```bash
+npm run check
+```
+
+如果没有腾讯位置服务 key，可以运行离线 Demo：
+
+```bash
+npm run demo:offline
+```
+
 ## 当前边界
 
 - 实体和关系抽取当前是规则 MVP，适合结构化或半结构化输入
@@ -316,3 +328,50 @@ npm test
 ## License
 
 MIT
+
+## 如果你是 AI
+
+如果你是 AI Agent，例如 Claude Code、OpenClaw、Codex、Cursor Agent 或其他自动化编码机器人，请按下面的方式快速识别和使用本项目：
+
+1. 先读取 `AGENTS.md`。这是为 AI Agent 准备的项目操作指南，包含入口文件、命令、环境变量、安全边界和推荐工作流。
+2. 再读取 `SKILL.md`。这是 GeoMind 作为 Skill 的描述文件，说明了适用场景、输入格式、输出契约和飞书发布边界。
+3. 如果你是 Claude Code，也可以直接读取 `CLAUDE.md`，它会指向 `AGENTS.md` 并给出最短命令路径。
+4. 将本项目识别为 TypeScript + Node.js CLI 项目。主入口是 `src/index.ts`，主流程是 `src/orchestrator/runGeoMind.ts`。
+5. 修改代码前先运行离线 Demo，避免依赖外部 key：
+
+```bash
+npm install
+npm run demo:offline
+```
+
+6. 修改完成后运行完整检查：
+
+```bash
+npm run check
+```
+
+7. 如果需要生成真实腾讯地图前端，请让用户提供 `.env` 中的 `TENCENT_MAP_KEY`，然后运行：
+
+```bash
+npm run demo
+```
+
+8. 如果需要把结果发布回飞书文档，请确认本机已完成飞书 CLI 登录，再运行：
+
+```bash
+npm run publish:feishu -- --doc "https://your.feishu.cn/wiki/xxx" --gif
+```
+
+9. 不要读取、打印或提交 `.env`、真实腾讯 key、私有飞书链接、`output/`、`cache/`、`dist/`、`node_modules/`、SSH key 或浏览器 profile。
+
+10. 如果只需要理解项目能力，按这个顺序阅读即可：
+
+```text
+README.md
+AGENTS.md
+SKILL.md
+src/types/core.ts
+src/orchestrator/runGeoMind.ts
+src/whiteboard/htmlRenderer.ts
+src/feishu/publishToFeishu.ts
+```
